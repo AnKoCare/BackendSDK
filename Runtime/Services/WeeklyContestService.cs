@@ -12,9 +12,8 @@ namespace GameBackendModule.Services
             Action<ApiResponse<WeeklyContestStatusResponse>> onSuccess,
             Action<ErrorResponse> onError);
 
-        /// <summary>POST /weekly-contest/claim — Bearer JWT. <paramref name="ackWeekId"/> = tuần frozen cần ack (sau cheat).</summary>
+        /// <summary>POST /weekly-contest/claim — Bearer JWT, body rỗng <c>{}</c>.</summary>
         IEnumerator Claim(
-            string ackWeekId,
             Action<ApiResponse<WeeklyContestClaimResponse>> onSuccess,
             Action<ErrorResponse> onError);
 
@@ -24,10 +23,10 @@ namespace GameBackendModule.Services
             Action<ApiResponse<WeeklyContestAddScoreResponse>> onSuccess,
             Action<ErrorResponse> onError);
 
-        /// <summary>POST /weekly-contest/cheat/end-week [DEV]. <paramref name="cheatKeyHeader"/> chỉ khi server production.</summary>
-        IEnumerator CheatEndWeek(
-            string cheatKeyHeader,
-            Action<ApiResponse<WeeklyContestCheatEndWeekResponse>> onSuccess,
+        /// <summary>POST /weekly-contest/dev/end-week — [DEV] ép kết thúc tuần open.</summary>
+        IEnumerator DevEndWeek(
+            string devKey,
+            Action<ApiResponse<WeeklyContestDevEndWeekResponse>> onSuccess,
             Action<ErrorResponse> onError);
     }
 
@@ -51,17 +50,12 @@ namespace GameBackendModule.Services
         }
 
         public IEnumerator Claim(
-            string ackWeekId,
             Action<ApiResponse<WeeklyContestClaimResponse>> onSuccess,
             Action<ErrorResponse> onError)
         {
-            object body = string.IsNullOrEmpty(ackWeekId)
-                ? new EmptyBody()
-                : new WeeklyContestClaimRequest { ackWeekId = ackWeekId };
-
             yield return apiClient.Post<WeeklyContestClaimResponse>(
                 ApiConstants.WEEKLY_CONTEST_CLAIM_ENDPOINT,
-                body,
+                new EmptyBody(),
                 onSuccess,
                 onError);
         }
@@ -78,26 +72,26 @@ namespace GameBackendModule.Services
                 onError);
         }
 
-        public IEnumerator CheatEndWeek(
-            string cheatKeyHeader,
-            Action<ApiResponse<WeeklyContestCheatEndWeekResponse>> onSuccess,
+        public IEnumerator DevEndWeek(
+            string devKey,
+            Action<ApiResponse<WeeklyContestDevEndWeekResponse>> onSuccess,
             Action<ErrorResponse> onError)
         {
-            IReadOnlyDictionary<string, string> headers = null;
-            if (!string.IsNullOrEmpty(cheatKeyHeader))
+            IReadOnlyDictionary<string, string> extraHeaders = null;
+            if (!string.IsNullOrWhiteSpace(devKey))
             {
-                headers = new Dictionary<string, string>
+                extraHeaders = new Dictionary<string, string>
                 {
-                    { ApiConstants.WEEKLY_CONTEST_CHEAT_KEY_HEADER, cheatKeyHeader },
+                    { ApiConstants.WEEKLY_CONTEST_DEV_KEY_HEADER, devKey.Trim() },
                 };
             }
 
-            yield return apiClient.Post<WeeklyContestCheatEndWeekResponse>(
-                ApiConstants.WEEKLY_CONTEST_CHEAT_END_WEEK_ENDPOINT,
+            yield return apiClient.Post<WeeklyContestDevEndWeekResponse>(
+                ApiConstants.WEEKLY_CONTEST_DEV_END_WEEK_ENDPOINT,
                 new EmptyBody(),
-                headers,
                 onSuccess,
-                onError);
+                onError,
+                extraHeaders);
         }
     }
 }

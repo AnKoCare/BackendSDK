@@ -8,6 +8,8 @@ namespace GameBackendModule.Services
     public interface IPlayerService
     {
         IEnumerator GetProfile(Action<ApiResponse<PlayerProfile>> onSuccess, Action<ErrorResponse> onError);
+        /// <summary>GET /player/profile?uid= — public. Lấy profile player theo mã hiển thị uid.</summary>
+        IEnumerator GetProfileByUid(string uid, Action<ApiResponse<PlayerProfile>> onSuccess, Action<ErrorResponse> onError);
         IEnumerator UpdateProfile(UpdatePlayerRequest request, Action<ApiResponse<PlayerProfile>> onSuccess, Action<ErrorResponse> onError);
         /// <summary>PUT /player/info — body chỉ gồm các key cần gửi (server merge với DEFAULT_PLAYER_INFO).</summary>
         IEnumerator UpdatePlayerInfo(Dictionary<string, object> infoFields, Action<ApiResponse<PlayerPatchResponse>> onSuccess, Action<ErrorResponse> onError);
@@ -30,6 +32,25 @@ namespace GameBackendModule.Services
         public IEnumerator GetProfile(Action<ApiResponse<PlayerProfile>> onSuccess, Action<ErrorResponse> onError)
         {
             yield return apiClient.Get(ApiConstants.PLAYER_PROFILE_ENDPOINT, onSuccess, onError);
+        }
+
+        public IEnumerator GetProfileByUid(string uid, Action<ApiResponse<PlayerProfile>> onSuccess, Action<ErrorResponse> onError)
+        {
+            if (string.IsNullOrEmpty(uid))
+            {
+                onError?.Invoke(new ErrorResponse
+                {
+                    success = false,
+                    message = "uid is required",
+                    error = "uid is required",
+                    statusCode = 400,
+                });
+                yield break;
+            }
+
+            string q = Uri.EscapeDataString(uid.Trim());
+            string endpoint = $"{ApiConstants.PLAYER_PROFILE_ENDPOINT}?uid={q}";
+            yield return apiClient.Get(endpoint, onSuccess, onError);
         }
 
         public IEnumerator UpdateProfile(UpdatePlayerRequest request, Action<ApiResponse<PlayerProfile>> onSuccess, Action<ErrorResponse> onError)

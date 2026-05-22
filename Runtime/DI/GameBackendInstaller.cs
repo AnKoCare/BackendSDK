@@ -18,7 +18,6 @@ namespace GameBackendModule.DI
                 .WithArguments(baseUrl);
 
             // Bind Services
-            
             Container.Bind<IAuthService>()
                 .To<AuthService>()
                 .AsSingle();

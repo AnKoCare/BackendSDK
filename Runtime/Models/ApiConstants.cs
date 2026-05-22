@@ -28,9 +28,9 @@ namespace GameBackendModule.Models
         public const string WEEKLY_CONTEST_STATUS_ENDPOINT = "/api/v1/weekly-contest/status";
         public const string WEEKLY_CONTEST_CLAIM_ENDPOINT = "/api/v1/weekly-contest/claim";
         public const string WEEKLY_CONTEST_ADD_SCORE_ENDPOINT = "/api/v1/weekly-contest/add-score";
-        /// <summary>[DEV] POST cheat/end-week — JWT; production cần header X-Cheat-Key.</summary>
-        public const string WEEKLY_CONTEST_CHEAT_END_WEEK_ENDPOINT = "/api/v1/weekly-contest/cheat/end-week";
-        public const string WEEKLY_CONTEST_CHEAT_KEY_HEADER = "X-Cheat-Key";
+        /// <summary>POST [DEV] ép kết thúc tuần open — Bearer JWT (+ dev key trên production).</summary>
+        public const string WEEKLY_CONTEST_DEV_END_WEEK_ENDPOINT = "/api/v1/weekly-contest/dev/end-week";
+        public const string WEEKLY_CONTEST_DEV_KEY_HEADER = "X-Weekly-Contest-Dev-Key";
 
         // Leaderboard (POST submit cần JWT; GET top/rank public)
         public const string LEADERBOARD_SUBMIT_ENDPOINT = "/api/v1/leaderboard/submit";

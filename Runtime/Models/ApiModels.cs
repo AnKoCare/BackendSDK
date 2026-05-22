@@ -60,6 +60,9 @@ namespace GameBackendModule.Models
         public int EffectNameIndex;
         public string TeamName;
         public int LogoTeamIndex;
+        public int WinStreak;
+        public int TotalCoinEarn;
+        public int BoosterUsed;
     }
 
     /// <summary>Player kèm auth (register / external-login).</summary>
@@ -269,13 +272,6 @@ namespace GameBackendModule.Models
         public WeeklyContestPendingClaim pendingClaim;
     }
 
-    /// <summary>Body POST /weekly-contest/claim.</summary>
-    [Serializable]
-    public class WeeklyContestClaimRequest
-    {
-        public string ackWeekId;
-    }
-
     /// <summary>POST /weekly-contest/claim.</summary>
     [Serializable]
     public class WeeklyContestClaimResponse
@@ -304,30 +300,16 @@ namespace GameBackendModule.Models
         public int rank;
     }
 
+    /// <summary>POST /weekly-contest/dev/end-week — [DEV] ép kết thúc tuần open.</summary>
     [Serializable]
-    public class WeeklyContestWeekResetStats
-    {
-        public int groupsRemoved;
-        public int membersRemoved;
-        public int scoreEventsRemoved;
-    }
-
-    [Serializable]
-    public class WeeklyContestCheatResetSummary
-    {
-        public WeeklyContestWeekResetStats frozenWeek;
-        public WeeklyContestWeekResetStats newWeek;
-    }
-
-    /// <summary>POST /weekly-contest/cheat/end-week [DEV].</summary>
-    [Serializable]
-    public class WeeklyContestCheatEndWeekResponse
+    public class WeeklyContestDevEndWeekResponse
     {
         public string frozenWeekId;
         public string newWeekId;
         public string newWeekStatus;
+        public string newWeekStartsAt;
+        public string newWeekEndsAt;
         public WeeklyContestPendingClaim pendingClaim;
-        public WeeklyContestCheatResetSummary reset;
     }
 
     // Leaderboard Models (khớp leaderboard.controller + leaderboard.service)

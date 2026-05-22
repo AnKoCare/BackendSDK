@@ -13,8 +13,7 @@ namespace GameBackendModule.Services
         void SetAuthToken(string token);
         void ClearAuthToken();
         IEnumerator Get<T>(string endpoint, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError);
-        IEnumerator Post<T>(string endpoint, object data, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError);
-        IEnumerator Post<T>(string endpoint, object data, IReadOnlyDictionary<string, string> extraHeaders, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError);
+        IEnumerator Post<T>(string endpoint, object data, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError, IReadOnlyDictionary<string, string> extraHeaders = null);
         IEnumerator Put<T>(string endpoint, object data, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError);
         IEnumerator Patch<T>(string endpoint, object data, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError);
         IEnumerator Delete<T>(string endpoint, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError);
@@ -44,35 +43,30 @@ namespace GameBackendModule.Services
 
         public IEnumerator Get<T>(string endpoint, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError)
         {
-            yield return SendRequest<T>(UnityWebRequest.kHttpVerbGET, endpoint, null, null, onSuccess, onError);
+            yield return SendRequest<T>(UnityWebRequest.kHttpVerbGET, endpoint, null, onSuccess, onError, null);
         }
 
-        public IEnumerator Post<T>(string endpoint, object data, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError)
+        public IEnumerator Post<T>(string endpoint, object data, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError, IReadOnlyDictionary<string, string> extraHeaders = null)
         {
-            yield return Post(endpoint, data, null, onSuccess, onError);
-        }
-
-        public IEnumerator Post<T>(string endpoint, object data, IReadOnlyDictionary<string, string> extraHeaders, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError)
-        {
-            yield return SendRequest<T>(UnityWebRequest.kHttpVerbPOST, endpoint, data, extraHeaders, onSuccess, onError);
+            yield return SendRequest<T>(UnityWebRequest.kHttpVerbPOST, endpoint, data, onSuccess, onError, extraHeaders);
         }
 
         public IEnumerator Put<T>(string endpoint, object data, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError)
         {
-            yield return SendRequest<T>(UnityWebRequest.kHttpVerbPUT, endpoint, data, null, onSuccess, onError);
+            yield return SendRequest<T>(UnityWebRequest.kHttpVerbPUT, endpoint, data, onSuccess, onError, null);
         }
 
         public IEnumerator Patch<T>(string endpoint, object data, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError)
         {
-            yield return SendRequest<T>(HttpVerbPatch, endpoint, data, null, onSuccess, onError);
+            yield return SendRequest<T>(HttpVerbPatch, endpoint, data, onSuccess, onError, null);
         }
 
         public IEnumerator Delete<T>(string endpoint, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError)
         {
-            yield return SendRequest<T>(UnityWebRequest.kHttpVerbDELETE, endpoint, null, null, onSuccess, onError);
+            yield return SendRequest<T>(UnityWebRequest.kHttpVerbDELETE, endpoint, null, onSuccess, onError, null);
         }
 
-        private IEnumerator SendRequest<T>(string method, string endpoint, object data, IReadOnlyDictionary<string, string> extraHeaders, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError)
+        private IEnumerator SendRequest<T>(string method, string endpoint, object data, Action<ApiResponse<T>> onSuccess, Action<ErrorResponse> onError, IReadOnlyDictionary<string, string> extraHeaders)
         {
             string url = baseUrl + endpoint;
             UnityWebRequest request = new UnityWebRequest(url, method);
@@ -88,10 +82,10 @@ namespace GameBackendModule.Services
 
             if (extraHeaders != null)
             {
-                foreach (KeyValuePair<string, string> header in extraHeaders)
+                foreach (var pair in extraHeaders)
                 {
-                    if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value))
-                        request.SetRequestHeader(header.Key, header.Value);
+                    if (!string.IsNullOrEmpty(pair.Key) && !string.IsNullOrEmpty(pair.Value))
+                        request.SetRequestHeader(pair.Key, pair.Value);
                 }
             }
 
